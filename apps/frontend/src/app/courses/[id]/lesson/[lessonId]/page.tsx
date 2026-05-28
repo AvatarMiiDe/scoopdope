@@ -8,6 +8,7 @@ import { NotesPanel } from '@/components/courses/NotesPanel';
 import { ChevronLeft, ChevronRight, Layout, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useVideoShortcuts } from '@/hooks/useVideoShortcuts';
+import { useSyncProgress } from '@/hooks/useSyncProgress';
 
 export default function LessonPage() {
   const params = useParams();
@@ -20,6 +21,8 @@ export default function LessonPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [sidebarTab, setSidebarTab] = useState<'transcript' | 'notes'>('transcript');
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const { recordProgress } = useSyncProgress();
 
   useVideoShortcuts(videoRef);
 
@@ -39,6 +42,19 @@ export default function LessonPage() {
     if (videoRef.current) {
       videoRef.current.currentTime = time;
       videoRef.current.play();
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!courseId || !lessonId) return;
+    setIsCompleting(true);
+    try {
+      await recordProgress(courseId, lessonId, 100);
+      setLesson((prev: any) => ({ ...prev, completed: true }));
+    } catch (error) {
+      console.error('Failed to mark lesson as complete:', error);
+    } finally {
+      setIsCompleting(false);
     }
   };
 
