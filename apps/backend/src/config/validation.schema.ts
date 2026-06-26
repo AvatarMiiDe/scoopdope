@@ -4,6 +4,7 @@ export const validationSchema = Joi.object({
   // App
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
   PORT: Joi.number().default(3000),
+  LOG_FORMAT: Joi.string().valid('text', 'json').default('text'),
 
   // Database
   DATABASE_HOST: Joi.string().required(),
@@ -16,11 +17,15 @@ export const validationSchema = Joi.object({
   JWT_SECRET: Joi.string().min(16).required(),
 
   // Redis
-  REDIS_URL: Joi.string().uri().required(),
+  REDIS_URL: Joi.string().uri().optional(),
+  REDIS_HOST: Joi.string().optional(),
+  REDIS_PORT: Joi.number().optional(),
+  REDIS_PASSWORD: Joi.string().optional(),
+  REDIS_DB: Joi.number().default(0),
 
   // Stellar
   STELLAR_NETWORK: Joi.string().valid('testnet', 'mainnet').default('testnet'),
-  STELLAR_SECRET_KEY: Joi.string().required(),
+  STELLAR_SECRET_KEY: Joi.string().optional(),
   SOROBAN_RPC_URL: Joi.string().uri().default('https://soroban-testnet.stellar.org'),
   SOROBAN_CONTRACT_ID: Joi.string().allow('').default(''),
   ENROLLMENT_CONTRACT_ID: Joi.string().allow('').default(''),
@@ -80,4 +85,7 @@ export const validationSchema = Joi.object({
 
   // Exchange Rate (optional — falls back to free open.er-api.com)
   EXCHANGE_RATE_API_KEY: Joi.string().allow('').default(''),
+
+  // OpenTelemetry
+  OTEL_SAMPLING_RATE: Joi.number().min(0).max(1).default(0.1),
 });
