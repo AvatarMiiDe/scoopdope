@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '@/lib/api';
 import { toast } from '@/lib/toast';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { BookOpen, Download, Plus, Search, Trash2, X } from 'lucide-react';
 
 interface Note {
@@ -104,8 +105,8 @@ export function NotesPanel({ lessonId, lessonTitle, currentTime, onSeek }: Notes
     const html = `<!DOCTYPE html><html><head><title>Notes — ${lessonTitle}</title>
       <style>body{font-family:sans-serif;max-width:700px;margin:40px auto;line-height:1.6}
       h1{font-size:1.4rem}span.ts{color:#4F46E5;font-weight:600;margin-right:8px}</style>
-      </head><body><h1>Notes — ${escHtml(lessonTitle)}</h1>
-      ${notes.map((n) => `<p><span class="ts">[${fmt(n.timestamp)}]</span>${escHtml(n.content)}</p>`).join('')}
+      </head><body><h1>Notes — ${sanitizeHtml(lessonTitle)}</h1>
+      ${notes.map((n) => `<p><span class="ts">[${fmt(n.timestamp)}]</span>${sanitizeHtml(n.content)}</p>`).join('')}
       </body></html>`;
     const win = window.open('', '_blank');
     if (!win) { toast.error('Allow pop-ups to export PDF'); return; }
@@ -224,6 +225,3 @@ function download(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-function escHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
